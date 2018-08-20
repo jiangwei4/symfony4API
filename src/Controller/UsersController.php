@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\FOSRestController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Symfony\Component\HttpFoundation\Request;
 
 class UsersController extends FOSRestController
 {
@@ -30,13 +31,28 @@ class UsersController extends FOSRestController
      */
     public function postUsersAction(User $user, EntityManagerInterface $em)
     {
+        $idd = uniqid ();
+        $user->setApiKey($idd);
         $this->em->persist($user);
         $this->em->flush();
         return $this->view($user);
     }
 
-    public function putUserAction($id)
-    {} // "put_user" [PUT] /users/{id}
+    public function putUserAction(Request $request, $id)
+    {
+            $us = $this->userRepository->findBy(['id'=>$id]);
+            $firstname = $request->get('firstname');
+            $lastname = $request->get('lastname');
+            $email = $request->get('email');
+            $birthday = $request->get('birthday');
+            $roles = $request->get('roles');
+            $apikey = $request->get('apiKey');
+            if($firstname != null && $firstname != $us->getFirstname()){
+                $us->setFirstname($firstname);
+            }
+
+
+    } // "put_user" [PUT] /users/{id}
     public function deleteUserAction($id)
     {} // "delete_user" [DELETE] /users/{id}
 }
