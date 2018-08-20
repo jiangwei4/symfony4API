@@ -29,7 +29,7 @@ class User
     private $lastname;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      */
     private $email;
 
@@ -124,4 +124,5 @@ class User
 
         return $this;
     }
+    
 }

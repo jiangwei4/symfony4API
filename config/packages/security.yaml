@@ -1,7 +1,7 @@
 security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        in_memory: { memory: ~ }
+        #in_memory: { memory: ~ }
         your_db_provider:
             entity:
                 class: App\Entity\User
@@ -11,8 +11,12 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: true
-
+            anonymous: ~
+            logout: ~
+            stateless: true
+            guard:
+                authenticators:
+                    - App\Security\TokenAuthenticator
             # activate different ways to authenticate
 
             # http_basic: true
