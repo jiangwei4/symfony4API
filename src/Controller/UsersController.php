@@ -135,8 +135,12 @@ class UsersController extends FOSRestController
     {
         /** @var User $us */
         $us = $this->userRepository->find($id);
-        $this->em->remove($us);
-        $this->em->flush();
+        if($us === $this->getUser()) {
+            $this->em->remove($us);
+            $this->em->flush();
+        } else {
+            return new JsonResponse('Not the same user or tu n as pas les droits');
+        }
     }
 
 

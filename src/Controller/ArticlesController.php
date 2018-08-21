@@ -41,7 +41,6 @@ class ArticlesController extends FOSRestController
     }
 
 
-
     /**
      * @Rest\View(serializerGroups={"article"})
      */
