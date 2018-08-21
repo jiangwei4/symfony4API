@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Swagger\Annotations as SWG;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity("email")
@@ -17,6 +18,7 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @SWG\Property(description="The unique identifier of the user.")
      */
     private $id;
     /**
@@ -28,11 +30,13 @@ class User implements UserInterface
     /**
      * @Groups("user")
      * @ORM\Column(type="string", length=255)
+     * @SWG\Property(type="string", maxLength=255)
      */
     private $lastname;
     /**
      * @Groups("user")
      * @ORM\Column(type="string", length=255)
+     * @SWG\Property(type="string", maxLength=255)
      */
     private $email;
     /**
@@ -46,12 +50,13 @@ class User implements UserInterface
     private $roles;
     /**
      * @ORM\Column(type="string", length=255, unique=true)
+     * @SWG\Property(type="string", maxLength=255)
      */
     private $apiKey;
     /**
      * @Groups("user")
      * @Groups("article")
-     * @ORM\OneToMany(targetEntity="App\Entity\Article", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="App\Entity\Article", mappedBy="user", cascade={"persist"})
      */
     private $articles;
     public function getId(): ?int

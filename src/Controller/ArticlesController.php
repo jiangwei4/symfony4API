@@ -2,9 +2,10 @@
 namespace App\Controller;
 
 use App\Entity\Article;
-use App\Repository\ArticlesRepository;
+use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\FOSRestController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -14,25 +15,55 @@ class ArticlesController extends FOSRestController
 {
     private $articlesRepository;
     private $em;
-    public function __construct(ArticlesRepository $articlesRepository, EntityManagerInterface $em)
+    public function __construct(ArticleRepository $articlesRepository, EntityManagerInterface $em)
     {
         $this->articlesRepository = $articlesRepository;
         $this->em = $em;
     }
+
+    public function testUser($user)
+    {
+        if ($this->getUser() === $user || in_array("ROLE_ADMIN",$this->getUser()->getRoles()) ) {
+            $return = true;
+        } else {
+            $return = false;
+        }
+        return $return;
+    }
+    public function testUserDroit()
+    {
+        if (in_array("ROLE_ADMIN",$this->getUser()->getRoles()) ) {
+            $return = true;
+        } else {
+            $return = false;
+        }
+        return $return;
+    }
+
+
+
     /**
-     * @Rest\View(serializerGroups={"article.user"})
+     * @Rest\View(serializerGroups={"article"})
      */
     public function getArticlesAction()
     {
-        $articles = $this->articlesRepository->findAll();
+        if ($this->testUserDroit()){
+            $articles = $this->articlesRepository->findAll();
         return $this->view($articles);
+        } else {
+            return new JsonResponse('tu n as pas les droits');
+        }
     }
     /**
-     * @Rest\View(serializerGroups={"article.user"})
+     * @Rest\View(serializerGroups={"article"})
      */
     public function getArticleAction(Article $article)
     {
-        return $this->view($article);
+        if($this->testUser($article->getUser())) {
+            return $this->view($article);
+        } else {
+            return new JsonResponse('tu n as pas les droits');
+        }
     }
     /**
      * @Rest\Post("/articles")
@@ -41,10 +72,14 @@ class ArticlesController extends FOSRestController
      */
     public function postArticlesAction(Article $article)
     {
-        $article->setUser($this->getUser());
-        $this->em->persist($article);
-        $this->em->flush();
-        return $this->view($article);
+        if($this->testUser($article->getUser())) {
+            $article->setUser($this->getUser());
+            $this->em->persist($article);
+            $this->em->flush();
+            return $this->view($article);
+        } else {
+            return new JsonResponse('tu n as pas les droits');
+        }
     }
     /**
      * @Rest\View(serializerGroups={"article.user"})
@@ -69,7 +104,11 @@ class ArticlesController extends FOSRestController
      */
     public function deleteArticleAction(Article $article)
     {
-        $this->em->remove($article);
-        $this->em->flush();
+        if($this->testUser($article->getUser())) {
+            $this->em->remove($article);
+            $this->em->flush();
+        } else {
+            return new JsonResponse('tu n as pas les droits');
+        }
     }
 }

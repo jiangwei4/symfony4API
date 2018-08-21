@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Swagger\Annotations as SWG;
 
 class UsersController extends FOSRestController
 {
@@ -20,14 +21,43 @@ class UsersController extends FOSRestController
         $this->em = $em;
     }
 
+
+    public function testUser($user)
+    {
+        if ($this->getUser() === $user || in_array("ROLE_ADMIN",$this->getUser()->getRoles()) ) {
+            $return = true;
+        } else {
+            $return = false;
+        }
+        return $return;
+    }
+    public function testUserDroit()
+    {
+        if (in_array("ROLE_ADMIN",$this->getUser()->getRoles()) ) {
+            $return = true;
+        } else {
+            $return = false;
+        }
+        return $return;
+    }
+
+
 // ceci va juste lister dans Entity/User les @Groups("user")
     /**
      * @Rest\View(serializerGroups={"user"})
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns all of an user"
+     * )
      */
     public function getUsersAction()
     {
-         $users = $this->userRepository->findAll();
-        return $this->view($users);
+        if($this->testUserDroit()) {
+            $users = $this->userRepository->findAll();
+            return $this->view($users);
+        } else {
+            return new JsonResponse('tu n as pas les droits');
+        }
     }
 
     /**
@@ -36,8 +66,15 @@ class UsersController extends FOSRestController
      */
     public function getUserAction(User $user)
     {
+
         //return new JsonResponse('Not the same user');
-        return $this->view($user);
+        //rajouter si admin
+
+        if ($this->testUser($user)) {
+            return $this->view($user);
+        } else {
+            return new JsonResponse('Not the same user or tu n as pas les droits');
+        }
         // "get_user"
     }
 
@@ -101,4 +138,8 @@ class UsersController extends FOSRestController
         $this->em->remove($us);
         $this->em->flush();
     }
+
+
+
+
 }

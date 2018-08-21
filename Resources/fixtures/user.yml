@@ -6,7 +6,7 @@ App\Entity\User:
         birthday: <dateTimeBetween('-100 years', '-10 years')>
 
 App\Entity\Article:
-    group_{1..10}:
+    article_{0..12}:
         user: '@user*'
         title: <sentence()>
         description: <sentence()>
