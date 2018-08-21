@@ -81,6 +81,7 @@ class ArticlesController extends FOSRestController
         }
     }
     /**
+     *
      * @Rest\View(serializerGroups={"article.user"})
      */
     public function putArticleAction(int $id, Request $request)

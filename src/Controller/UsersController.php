@@ -66,16 +66,11 @@ class UsersController extends FOSRestController
      */
     public function getUserAction(User $user)
     {
-
-        //return new JsonResponse('Not the same user');
-        //rajouter si admin
-
         if ($this->testUser($user)) {
             return $this->view($user);
         } else {
             return new JsonResponse('Not the same user or tu n as pas les droits');
         }
-        // "get_user"
     }
 
 
@@ -129,6 +124,13 @@ class UsersController extends FOSRestController
     }
 
     /**
+     * @SWG\Parameter(
+     *     name="AUTH-TOKEN",
+     *     in="header",
+     *     type="string",
+     *     description="Api Token"
+     * )
+     * @SWG\Response(response=200, description="")
      * @Rest\View(serializerGroups={"user"})
      */
     public function deleteUserAction($id)
