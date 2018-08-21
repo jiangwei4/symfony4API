@@ -5,3 +5,8 @@ App\Entity\User:
         email: <email()>
         birthday: <dateTimeBetween('-100 years', '-10 years')>
 
+App\Entity\Article:
+    group_{1..10}:
+        user: '@user*'
+        title: <sentence()>
+        description: <sentence()>

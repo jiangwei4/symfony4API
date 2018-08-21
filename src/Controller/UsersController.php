@@ -43,6 +43,8 @@ class UsersController extends FOSRestController
 
 
     /**
+     *
+     * @Rest\View(serializerGroups={"user"})
      * @Rest\Post("/users")
      * @ParamConverter("user", converter="fos_rest.request_body")
      */
@@ -53,6 +55,9 @@ class UsersController extends FOSRestController
         return $this->view($user);
     }
 
+    /**
+     * @Rest\View(serializerGroups={"user"})
+     */
     public function putUserAction(Request $request, $id)
     {
         if ($id !== $this->getUser()->getId()){
@@ -86,6 +91,9 @@ class UsersController extends FOSRestController
         $this->em->flush();
     }
 
+    /**
+     * @Rest\View(serializerGroups={"user"})
+     */
     public function deleteUserAction($id)
     {
         /** @var User $us */

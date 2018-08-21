@@ -37,6 +37,7 @@ class ArticlesController extends FOSRestController
     /**
      * @Rest\Post("/articles")
      * @ParamConverter("article", converter="fos_rest.request_body")
+     * @Rest\View(serializerGroups={"article.user"})
      */
     public function postArticlesAction(Article $article)
     {
@@ -45,6 +46,9 @@ class ArticlesController extends FOSRestController
         $this->em->flush();
         return $this->view($article);
     }
+    /**
+     * @Rest\View(serializerGroups={"article.user"})
+     */
     public function putArticleAction(int $id, Request $request)
     {
         $tl = $request->get('title');
@@ -60,6 +64,9 @@ class ArticlesController extends FOSRestController
         $this->em->flush();
         return $this->view($article);
     }
+    /**
+     * @Rest\View(serializerGroups={"article.user"})
+     */
     public function deleteArticleAction(Article $article)
     {
         $this->em->remove($article);
