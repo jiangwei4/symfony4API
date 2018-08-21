@@ -48,9 +48,6 @@ class UsersController extends FOSRestController
      */
     public function postUsersAction(User $user, EntityManagerInterface $em)
     {
-        $idd = uniqid ();
-        $user->setApiKey($idd);
-        $user->setRoles(array ('ROLE_USER'));
         $this->em->persist($user);
         $this->em->flush();
         return $this->view($user);

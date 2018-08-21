@@ -68,6 +68,9 @@
     "doctrine/reflection": {
         "version": "v1.0.0"
     },
+    "exsyst/swagger": {
+        "version": "v0.4.1"
+    },
     "friendsofsymfony/rest-bundle": {
         "version": "2.2",
         "recipe": {
@@ -105,6 +108,15 @@
             "branch": "master",
             "version": "3.2",
             "ref": "5ef2976310e8f9621c1a722a73bfbe115c1559a3"
+        }
+    },
+    "nelmio/api-doc-bundle": {
+        "version": "3.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "3.0",
+            "ref": "c8e0c38e1a280ab9e37587a8fa32b251d5bc1c94"
         }
     },
     "nikic/php-parser": {
@@ -145,6 +157,9 @@
             "version": "5.2",
             "ref": "fb7e19da7f013d0d422fa9bce16f5c510e27609b"
         }
+    },
+    "symfony/asset": {
+        "version": "v4.1.3"
     },
     "symfony/cache": {
         "version": "v4.1.0"
@@ -232,6 +247,9 @@
             "version": "3.1",
             "ref": "51b7a31438c8aeeda7931a0ece98a945c91e7f20"
         }
+    },
+    "symfony/options-resolver": {
+        "version": "v4.1.3"
     },
     "symfony/orm-pack": {
         "version": "v1.0.5"
@@ -367,5 +385,8 @@
     },
     "zendframework/zend-eventmanager": {
         "version": "3.2.1"
+    },
+    "zircote/swagger-php": {
+        "version": "2.0.13"
     }
 }
