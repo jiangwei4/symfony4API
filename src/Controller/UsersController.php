@@ -20,13 +20,26 @@ class UsersController extends FOSRestController
         $this->em = $em;
     }
 
-
-    public function getUsersAction(User $user)
+// ceci va juste lister dans Entity/User les @Groups("user")
+    /**
+     * @Rest\View(serializerGroups={"user"})
+     */
+    public function getUsersAction()
     {
-        // $users = $this->userRepository->findAll();
-        return $this->view($user);
+         $users = $this->userRepository->findAll();
+        return $this->view($users);
     }
 
+    /**
+     * @Rest\View(serializerGroups={"user"})
+     * @return \FOS\RestBundle\View\View
+     */
+    public function getUserAction(User $user)
+    {
+        //return new JsonResponse('Not the same user');
+        return $this->view($user);
+        // "get_user"
+    }
 
 
     /**
@@ -74,15 +87,13 @@ class UsersController extends FOSRestController
         }
         $this->em->persist($us);
         $this->em->flush();
-
-
     }
+
     public function deleteUserAction($id)
     {
         /** @var User $us */
         $us = $this->userRepository->find($id);
         $this->em->remove($us);
         $this->em->flush();
-
     }
 }

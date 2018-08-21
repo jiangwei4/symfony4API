@@ -13,26 +13,30 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class User implements UserInterface
 {
     /**
+     *
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
     private $id;
     /**
+     *
      * @Groups("user")
-     * @Groups("article")
      * @ORM\Column(type="string", length=255)
      */
     private $firstname;
     /**
+     * @Groups("user")
      * @ORM\Column(type="string", length=255)
      */
     private $lastname;
     /**
+     * @Groups("user")
      * @ORM\Column(type="string", length=255)
      */
     private $email;
     /**
+     * @Groups("user")
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $birthday;

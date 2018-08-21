@@ -14,12 +14,13 @@ class Article
      */
     private $id;
     /**
-     * @Groups("user")
+     * @Groups("article.user")
      * @Groups("article")
      * @ORM\Column(type="string", length=255)
      */
     private $title;
     /**
+     * @Groups("article")
      * @ORM\Column(type="string", length=255)
      */
     private $description;
