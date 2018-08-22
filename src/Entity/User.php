@@ -56,7 +56,7 @@ class User implements UserInterface
     /**
      * @Groups("user")
      * @Groups("article")
-     * @ORM\OneToMany(targetEntity="App\Entity\Article", mappedBy="user", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Article", mappedBy="user", cascade={"remove"})
      */
     private $articles;
     public function getId(): ?int

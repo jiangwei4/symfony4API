@@ -89,10 +89,10 @@ class ArticlesController extends FOSRestController
         $tl = $request->get('title');
         $dp = $request->get('description');
         $article = $this->articlesRepository->find($id);
-        if ( $tl ){
+        if ($tl) {
             $article->setTitle($tl);
         }
-        if ( $dp ){
+        if ($dp) {
             $article->setDescription($dp);
         }
         $this->em->persist($article);

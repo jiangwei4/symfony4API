@@ -92,35 +92,37 @@ class UsersController extends FOSRestController
      */
     public function putUserAction(Request $request, $id)
     {
-        if ($id !== $this->getUser()->getId()){
+        if ($id === $this->getUser()->getId() || $this->testUserDroit()){
+
+            /** @var User $us */
+            $us = $this->userRepository->find($id);
+
+            $firstname = $request->get('firstname');
+            $lastname = $request->get('lastname');
+            $email = $request->get('email');
+            $birthday = $request->get('birthday');
+            $roles = $request->get('roles');
+           # $apikey = $request->get('apiKey');
+            if(isset($firstname)){
+                $us->setFirstname($firstname);
+            }
+            if(isset($lastname)){
+                $us->setLastname($lastname);
+            }
+            if(isset($email)){
+                $us->setEmail($email);
+            }
+            if(isset($birthday)){
+                $us->setBirthday($birthday);
+            }
+            if(isset($roles)) {
+                $us->setRoles($roles);
+            }
+            $this->em->persist($us);
+            $this->em->flush();
+        } else {
             return new JsonResponse('error');
         }
-        /** @var User $us */
-        $us = $this->userRepository->find($id);
-
-        $firstname = $request->get('firstname');
-        $lastname = $request->get('lastname');
-        $email = $request->get('email');
-        $birthday = $request->get('birthday');
-        $roles = $request->get('roles');
-       # $apikey = $request->get('apiKey');
-        if(isset($firstname)){
-            $us->setFirstname($firstname);
-        }
-        if(isset($lastname)){
-            $us->setLastname($lastname);
-        }
-        if(isset($email)){
-            $us->setEmail($email);
-        }
-        if(isset($birthday)){
-            $us->setBirthday($birthday);
-        }
-        if(isset($roles)) {
-            $us->setRoles($roles);
-        }
-        $this->em->persist($us);
-        $this->em->flush();
     }
 
     /**
@@ -137,7 +139,7 @@ class UsersController extends FOSRestController
     {
         /** @var User $us */
         $us = $this->userRepository->find($id);
-        if($us === $this->getUser()) {
+        if($us === $this->getUser() || $this->testUserDroit()) {
             $this->em->remove($us);
             $this->em->flush();
         } else {
