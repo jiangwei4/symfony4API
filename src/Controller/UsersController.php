@@ -43,7 +43,7 @@ class UsersController extends FOSRestController
         return $return;
     }
 
-    public function PostPutDelete($validationErrors){
+    public function PostError($validationErrors){
         $error = array("error :");
         /** @var ConstraintViolationListInterface $validationErrors */
         /** @var ConstraintViolation $constraintViolation */
@@ -115,7 +115,7 @@ class UsersController extends FOSRestController
             $this->em->flush();
             return $this->view($user);
         } else {
-            return new JsonResponse($this->PostPutDelete($validationErrors));
+            return new JsonResponse($this->PostError($validationErrors));
         }
     }
 
@@ -130,42 +130,44 @@ class UsersController extends FOSRestController
      * @SWG\Tag(name="user")
      * @Rest\View(serializerGroups={"user"})
      */
-    public function putUserAction(Request $request, $id, ConstraintViolationListInterface $validationErrors)
+    public function putUserAction(Request $request, $id)
     {
-        if(!($validationErrors->count() > 0) ) {
-            if ($id === $this->getUser()->getId() || $this->testUserDroit()) {
 
-                /** @var User $us */
-                $us = $this->userRepository->find($id);
+        if ($id === $this->getUser()->getId() || $this->testUserDroit()) {
 
-                $firstname = $request->get('firstname');
-                $lastname = $request->get('lastname');
-                $email = $request->get('email');
-                $birthday = $request->get('birthday');
-                $roles = $request->get('roles');
-                # $apikey = $request->get('apiKey');
-                if (isset($firstname)) {
-                    $us->setFirstname($firstname);
-                }
-                if (isset($lastname)) {
-                    $us->setLastname($lastname);
-                }
-                if (isset($email)) {
-                    $us->setEmail($email);
-                }
-                if (isset($birthday)) {
-                    $us->setBirthday($birthday);
-                }
-                if (isset($roles)) {
-                    $us->setRoles($roles);
-                }
-                $this->em->persist($us);
+            /** @var User $us */
+            $us = $this->userRepository->find($id);
+
+            $firstname = $request->get('firstname');
+            $lastname = $request->get('lastname');
+            $email = $request->get('email');
+            $birthday = $request->get('birthday');
+            $roles = $request->get('roles');
+            # $apikey = $request->get('apiKey');
+            if (isset($firstname)) {
+                $us->setFirstname($firstname);
+            }
+            if (isset($lastname)) {
+                $us->setLastname($lastname);
+            }
+            if (isset($email)) {
+                $us->setEmail($email);
+            }
+            if (isset($birthday)) {
+                $us->setBirthday($birthday);
+            }
+            if (isset($roles)) {
+                $us->setRoles($roles);
+            }
+            $this->em->persist($us);
+            try {
                 $this->em->flush();
-            } else {
-                return new JsonResponse('error');
+            }
+            catch (\Exception $exception){
+                return $this->view($exception->getMessage(),  400);
             }
         } else {
-            return new JsonResponse($this->PostPutDelete($validationErrors));
+            return new JsonResponse('error');
         }
     }
 
@@ -180,19 +182,20 @@ class UsersController extends FOSRestController
      * @SWG\Tag(name="user")
      * @Rest\View(serializerGroups={"user"})
      */
-    public function deleteUserAction($id, ConstraintViolationListInterface $validationErrors)
+    public function deleteUserAction($id)
     {
-        if(!($validationErrors->count() > 0) ) {
-            /** @var User $us */
-            $us = $this->userRepository->find($id);
-            if ($us === $this->getUser() || $this->testUserDroit()) {
-                $this->em->remove($us);
+        /** @var User $us */
+        $us = $this->userRepository->find($id);
+        if ($us === $this->getUser() || $this->testUserDroit()) {
+            $this->em->remove($us);
+            try {
                 $this->em->flush();
-            } else {
-                return new JsonResponse('Not the same user or tu n as pas les droits');
+            }
+            catch (\Exception $exception){
+                return $this->view($exception->getMessage(),  400);
             }
         } else {
-            return new JsonResponse($this->PostPutDelete($validationErrors));
+            return new JsonResponse('Not the same user or tu n as pas les droits');
         }
     }
 

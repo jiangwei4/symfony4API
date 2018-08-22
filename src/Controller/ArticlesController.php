@@ -44,7 +44,7 @@ class ArticlesController extends FOSRestController
     }
 
 
-    public function PostPutDelete($validationErrors){
+    public function PostError($validationErrors){
         $error = array("error :");
         /** @var ConstraintViolationListInterface $validationErrors */
         /** @var ConstraintViolation $constraintViolation */
@@ -116,7 +116,7 @@ class ArticlesController extends FOSRestController
             $this->em->flush();
             return $this->view($article);
         } else  {
-            return new JsonResponse($this->PostPutDelete($validationErrors));
+            return new JsonResponse($this->PostError($validationErrors));
         }
     }
     /**
@@ -124,23 +124,24 @@ class ArticlesController extends FOSRestController
      * @SWG\Tag(name="article")
      * @Rest\View(serializerGroups={"article"})
      */
-    public function putArticleAction(int $id, Request $request, ConstraintViolationListInterface $validationErrors)
+    public function putArticleAction(int $id, Request $request)
     {
-        if(!($validationErrors->count() > 0) ) {
-            $tl = $request->get('title');
-            $dp = $request->get('description');
-            $article = $this->articlesRepository->find($id);
-            if ($tl) {
-                $article->setTitle($tl);
-            }
-            if ($dp) {
-                $article->setDescription($dp);
-            }
-            $this->em->persist($article);
+        $tl = $request->get('title');
+        $dp = $request->get('description');
+        $article = $this->articlesRepository->find($id);
+        if ($tl) {
+            $article->setTitle($tl);
+        }
+        if ($dp) {
+            $article->setDescription($dp);
+        }
+        $this->em->persist($article);
+
+        try {
             $this->em->flush();
-            return $this->view($article);
-        } else {
-            return new JsonResponse($this->PostPutDelete($validationErrors));
+        }
+        catch (\Exception $exception){
+            return $this->view($exception->getMessage(),  400);
         }
     }
     /**
@@ -154,17 +155,18 @@ class ArticlesController extends FOSRestController
      * @SWG\Tag(name="article")
      * @Rest\View(serializerGroups={"article"})
      */
-    public function deleteArticleAction(Article $article, ConstraintViolationListInterface $validationErrors)
+    public function deleteArticleAction(Article $article)
     {
-        if(!($validationErrors->count() > 0) ) {
-            if ($this->testUser($article->getUser())) {
-                $this->em->remove($article);
+        if ($this->testUser($article->getUser())) {
+            $this->em->remove($article);
+            try {
                 $this->em->flush();
-            } else {
-                return new JsonResponse('tu n as pas les droits');
+            }
+            catch (\Exception $exception){
+                return $this->view($exception->getMessage(),  400);
             }
         } else {
-            return new JsonResponse($this->PostPutDelete($validationErrors));
+            return new JsonResponse('tu n as pas les droits');
         }
     }
 }
