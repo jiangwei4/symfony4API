@@ -44,11 +44,14 @@ class UsersController extends FOSRestController
 
 // ceci va juste lister dans Entity/User les @Groups("user")
     /**
-     * @Rest\View(serializerGroups={"user"})
-     * @SWG\Response(
-     *     response=200,
-     *     description="Returns all of an user"
+     *  @SWG\Parameter(
+     *     name="AUTH-TOKEN",
+     *     in="header",
+     *     type="string",
+     *     description="Api Token"
      * )
+     * @SWG\Response(response=200, description="")
+     * @Rest\View(serializerGroups={"user"})
      */
     public function getUsersAction()
     {
@@ -61,6 +64,13 @@ class UsersController extends FOSRestController
     }
 
     /**
+     *  @SWG\Parameter(
+     *     name="AUTH-TOKEN",
+     *     in="header",
+     *     type="string",
+     *     description="Api Token"
+     * )
+     * @SWG\Response(response=200, description="")
      * @Rest\View(serializerGroups={"user"})
      * @return \FOS\RestBundle\View\View
      */
@@ -88,6 +98,13 @@ class UsersController extends FOSRestController
     }
 
     /**
+     *  @SWG\Parameter(
+     *     name="AUTH-TOKEN",
+     *     in="header",
+     *     type="string",
+     *     description="Api Token"
+     * )
+     * @SWG\Response(response=200, description="")
      * @Rest\View(serializerGroups={"user"})
      */
     public function putUserAction(Request $request, $id)

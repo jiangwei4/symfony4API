@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Swagger\Annotations as SWG;
 
 
 class ArticlesController extends FOSRestController
@@ -42,6 +43,13 @@ class ArticlesController extends FOSRestController
 
 
     /**
+     *  @SWG\Parameter(
+     *     name="AUTH-TOKEN",
+     *     in="header",
+     *     type="string",
+     *     description="Api Token"
+     * )
+     * @SWG\Response(response=200, description="")
      * @Rest\View(serializerGroups={"article"})
      */
     public function getArticlesAction()
@@ -54,6 +62,13 @@ class ArticlesController extends FOSRestController
         }
     }
     /**
+     *  @SWG\Parameter(
+     *     name="AUTH-TOKEN",
+     *     in="header",
+     *     type="string",
+     *     description="Api Token"
+     * )
+     * @SWG\Response(response=200, description="")
      * @Rest\View(serializerGroups={"article"})
      */
     public function getArticleAction(Article $article)
@@ -65,6 +80,13 @@ class ArticlesController extends FOSRestController
         }
     }
     /**
+     *  @SWG\Parameter(
+     *     name="AUTH-TOKEN",
+     *     in="header",
+     *     type="string",
+     *     description="Api Token"
+     * )
+     * @SWG\Response(response=200, description="")
      * @Rest\Post("/articles")
      * @ParamConverter("article", converter="fos_rest.request_body")
      * @Rest\View(serializerGroups={"article.user"})
@@ -100,6 +122,13 @@ class ArticlesController extends FOSRestController
         return $this->view($article);
     }
     /**
+     *  @SWG\Parameter(
+     *     name="AUTH-TOKEN",
+     *     in="header",
+     *     type="string",
+     *     description="Api Token"
+     * )
+     * @SWG\Response(response=200, description="")
      * @Rest\View(serializerGroups={"article.user"})
      */
     public function deleteArticleAction(Article $article)
