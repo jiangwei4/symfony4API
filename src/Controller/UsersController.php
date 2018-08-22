@@ -144,8 +144,7 @@ class UsersController extends FOSRestController
                 $lastname = $request->get('lastname');
                 $email = $request->get('email');
                 $birthday = $request->get('birthday');
-                $roles = $request->get('roles');
-                # $apikey = $request->get('apiKey');
+
                 if (isset($firstname)) {
                     $us->setFirstname($firstname);
                 }
@@ -157,9 +156,6 @@ class UsersController extends FOSRestController
                 }
                 if (isset($birthday)) {
                     $us->setBirthday($birthday);
-                }
-                if (isset($roles)) {
-                    $us->setRoles($roles);
                 }
                 $this->em->persist($us);
                 /** @var ConstraintViolationList $valisationErrors */
