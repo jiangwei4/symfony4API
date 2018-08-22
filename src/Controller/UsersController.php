@@ -71,12 +71,13 @@ class UsersController extends FOSRestController
      */
     public function getUsersAction()
     {
-        if($this->testUserDroit()) {
-            $users = $this->userRepository->findAll();
-            return $this->view($users);
-        } else {
-            return new JsonResponse('tu n as pas les droits');
-        }
+        $user = $this->getUser();
+
+//        if (!$user || !in_array("ROLE_ADMIN", $user->getRoles())){
+//            return $this->view('Not Logged or not an Admin', 401);
+//        }
+
+        return $this->view($this->userRepository->findAll());
     }
 
 
@@ -95,11 +96,13 @@ class UsersController extends FOSRestController
      */
     public function getUserAction(User $user)
     {
-        if ($this->testUser($user)) {
-            return $this->view($user);
-        } else {
-            return new JsonResponse('Not the same user or tu n as pas les droits');
+        if ($this->getUser() !== $user || !in_array("ROLE_ADMIN",$this->getUser()->getRoles())){
+            if ( !in_array("ROLE_ADMIN",$this->getUser()->getRoles()) ){
+                return $this->view('Not Authorized', 401);
+            }
         }
+
+        return $this->view($user);
     }
 
 

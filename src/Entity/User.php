@@ -52,6 +52,7 @@ class User implements UserInterface
      */
     private $birthday;
     /**
+     * @Groups("user")
      * @ORM\Column(type="simple_array")
      */
     private $roles;
