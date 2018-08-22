@@ -26,7 +26,7 @@ class UsersController extends FOSRestController
     }
 
 
-    public function testUser($user)
+    private function testUser($user)
     {
         if ($this->getUser() === $user || in_array("ROLE_ADMIN",$this->getUser()->getRoles()) ) {
             $return = true;
@@ -35,7 +35,7 @@ class UsersController extends FOSRestController
         }
         return $return;
     }
-    public function testUserDroit()
+    private function testUserDroit()
     {
         if (in_array("ROLE_ADMIN",$this->getUser()->getRoles()) ) {
             $return = true;
@@ -45,7 +45,7 @@ class UsersController extends FOSRestController
         return $return;
     }
 
-    public function PostError($validationErrors){
+    private function PostError($validationErrors){
         $error = array("error :");
         /** @var ConstraintViolationListInterface $validationErrors */
         /** @var ConstraintViolation $constraintViolation */
