@@ -7,6 +7,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity("email")
@@ -25,18 +26,24 @@ class User implements UserInterface
      *
      * @Groups("user")
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $firstname;
     /**
      * @Groups("user")
      * @ORM\Column(type="string", length=255)
      * @SWG\Property(type="string", maxLength=255)
+     * @Assert\NotBlank()
      */
     private $lastname;
     /**
      * @Groups("user")
      * @ORM\Column(type="string", length=255)
      * @SWG\Property(type="string", maxLength=255)
+     *  @Assert\Email(
+     *     message = "The email '{{ value }}' is not a valid email.",
+     *     checkMX = true
+     * )
      */
     private $email;
     /**

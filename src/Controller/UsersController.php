@@ -9,6 +9,8 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class UsersController extends FOSRestController
 {
@@ -41,6 +43,17 @@ class UsersController extends FOSRestController
         return $return;
     }
 
+    public function PostPutDelete($validationErrors){
+        $error = array("error :");
+        /** @var ConstraintViolationListInterface $validationErrors */
+        /** @var ConstraintViolation $constraintViolation */
+        foreach ($validationErrors as $constraintViolation) {
+            $message = $constraintViolation->getMessage();
+            $propertyPath = $constraintViolation->getPropertyPath();
+            array_push($error,$propertyPath.' => '.$message);
+        }
+        return $error;
+    }
 
 // ceci va juste lister dans Entity/User les @Groups("user")
     /**
@@ -51,6 +64,7 @@ class UsersController extends FOSRestController
      *     description="Api Token"
      * )
      * @SWG\Response(response=200, description="")
+     * @SWG\Tag(name="user")
      * @Rest\View(serializerGroups={"user"})
      */
     public function getUsersAction()
@@ -63,6 +77,8 @@ class UsersController extends FOSRestController
         }
     }
 
+
+    //@return \FOS\RestBundle\View\View
     /**
      *  @SWG\Parameter(
      *     name="AUTH-TOKEN",
@@ -71,8 +87,9 @@ class UsersController extends FOSRestController
      *     description="Api Token"
      * )
      * @SWG\Response(response=200, description="")
+     * @SWG\Tag(name="user")
      * @Rest\View(serializerGroups={"user"})
-     * @return \FOS\RestBundle\View\View
+     *
      */
     public function getUserAction(User $user)
     {
@@ -85,16 +102,21 @@ class UsersController extends FOSRestController
 
 
     /**
-     *
+     * @SWG\Response(response=200, description="")
+     * @SWG\Tag(name="user")
      * @Rest\View(serializerGroups={"user"})
      * @Rest\Post("/users")
      * @ParamConverter("user", converter="fos_rest.request_body")
      */
-    public function postUsersAction(User $user, EntityManagerInterface $em)
+    public function postUsersAction(User $user, EntityManagerInterface $em, ConstraintViolationListInterface $validationErrors)
     {
-        $this->em->persist($user);
-        $this->em->flush();
-        return $this->view($user);
+        if(!($validationErrors->count() > 0) ){
+            $this->em->persist($user);
+            $this->em->flush();
+            return $this->view($user);
+        } else {
+            return new JsonResponse($this->PostPutDelete($validationErrors));
+        }
     }
 
     /**
@@ -105,40 +127,45 @@ class UsersController extends FOSRestController
      *     description="Api Token"
      * )
      * @SWG\Response(response=200, description="")
+     * @SWG\Tag(name="user")
      * @Rest\View(serializerGroups={"user"})
      */
-    public function putUserAction(Request $request, $id)
+    public function putUserAction(Request $request, $id, ConstraintViolationListInterface $validationErrors)
     {
-        if ($id === $this->getUser()->getId() || $this->testUserDroit()){
+        if(!($validationErrors->count() > 0) ) {
+            if ($id === $this->getUser()->getId() || $this->testUserDroit()) {
 
-            /** @var User $us */
-            $us = $this->userRepository->find($id);
+                /** @var User $us */
+                $us = $this->userRepository->find($id);
 
-            $firstname = $request->get('firstname');
-            $lastname = $request->get('lastname');
-            $email = $request->get('email');
-            $birthday = $request->get('birthday');
-            $roles = $request->get('roles');
-           # $apikey = $request->get('apiKey');
-            if(isset($firstname)){
-                $us->setFirstname($firstname);
+                $firstname = $request->get('firstname');
+                $lastname = $request->get('lastname');
+                $email = $request->get('email');
+                $birthday = $request->get('birthday');
+                $roles = $request->get('roles');
+                # $apikey = $request->get('apiKey');
+                if (isset($firstname)) {
+                    $us->setFirstname($firstname);
+                }
+                if (isset($lastname)) {
+                    $us->setLastname($lastname);
+                }
+                if (isset($email)) {
+                    $us->setEmail($email);
+                }
+                if (isset($birthday)) {
+                    $us->setBirthday($birthday);
+                }
+                if (isset($roles)) {
+                    $us->setRoles($roles);
+                }
+                $this->em->persist($us);
+                $this->em->flush();
+            } else {
+                return new JsonResponse('error');
             }
-            if(isset($lastname)){
-                $us->setLastname($lastname);
-            }
-            if(isset($email)){
-                $us->setEmail($email);
-            }
-            if(isset($birthday)){
-                $us->setBirthday($birthday);
-            }
-            if(isset($roles)) {
-                $us->setRoles($roles);
-            }
-            $this->em->persist($us);
-            $this->em->flush();
         } else {
-            return new JsonResponse('error');
+            return new JsonResponse($this->PostPutDelete($validationErrors));
         }
     }
 
@@ -150,17 +177,22 @@ class UsersController extends FOSRestController
      *     description="Api Token"
      * )
      * @SWG\Response(response=200, description="")
+     * @SWG\Tag(name="user")
      * @Rest\View(serializerGroups={"user"})
      */
-    public function deleteUserAction($id)
+    public function deleteUserAction($id, ConstraintViolationListInterface $validationErrors)
     {
-        /** @var User $us */
-        $us = $this->userRepository->find($id);
-        if($us === $this->getUser() || $this->testUserDroit()) {
-            $this->em->remove($us);
-            $this->em->flush();
+        if(!($validationErrors->count() > 0) ) {
+            /** @var User $us */
+            $us = $this->userRepository->find($id);
+            if ($us === $this->getUser() || $this->testUserDroit()) {
+                $this->em->remove($us);
+                $this->em->flush();
+            } else {
+                return new JsonResponse('Not the same user or tu n as pas les droits');
+            }
         } else {
-            return new JsonResponse('Not the same user or tu n as pas les droits');
+            return new JsonResponse($this->PostPutDelete($validationErrors));
         }
     }
 

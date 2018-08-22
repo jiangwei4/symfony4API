@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 
 class ArticlesController extends FOSRestController
@@ -42,6 +44,18 @@ class ArticlesController extends FOSRestController
     }
 
 
+    public function PostPutDelete($validationErrors){
+        $error = array("error :");
+        /** @var ConstraintViolationListInterface $validationErrors */
+        /** @var ConstraintViolation $constraintViolation */
+        foreach ($validationErrors as $constraintViolation) {
+            $message = $constraintViolation->getMessage();
+            $propertyPath = $constraintViolation->getPropertyPath();
+            array_push($error,$propertyPath.' => '.$message);
+        }
+        return $error;
+    }
+
     /**
      *  @SWG\Parameter(
      *     name="AUTH-TOKEN",
@@ -50,6 +64,7 @@ class ArticlesController extends FOSRestController
      *     description="Api Token"
      * )
      * @SWG\Response(response=200, description="")
+     * @SWG\Tag(name="article")
      * @Rest\View(serializerGroups={"article"})
      */
     public function getArticlesAction()
@@ -69,6 +84,7 @@ class ArticlesController extends FOSRestController
      *     description="Api Token"
      * )
      * @SWG\Response(response=200, description="")
+     * @SWG\Tag(name="article")
      * @Rest\View(serializerGroups={"article"})
      */
     public function getArticleAction(Article $article)
@@ -87,39 +103,45 @@ class ArticlesController extends FOSRestController
      *     description="Api Token"
      * )
      * @SWG\Response(response=200, description="")
+     * @SWG\Tag(name="article")
+     * @Rest\View(serializerGroups={"article"})
      * @Rest\Post("/articles")
      * @ParamConverter("article", converter="fos_rest.request_body")
-     * @Rest\View(serializerGroups={"article.user"})
      */
-    public function postArticlesAction(Article $article)
+    public function postArticlesAction(Article $article, ConstraintViolationListInterface $validationErrors)
     {
-        if($this->testUser($article->getUser())) {
+        if(!($validationErrors->count() > 0) ) {
             $article->setUser($this->getUser());
             $this->em->persist($article);
             $this->em->flush();
             return $this->view($article);
-        } else {
-            return new JsonResponse('tu n as pas les droits');
+        } else  {
+            return new JsonResponse($this->PostPutDelete($validationErrors));
         }
     }
     /**
-     *
-     * @Rest\View(serializerGroups={"article.user"})
+     * @SWG\Response(response=200, description="")
+     * @SWG\Tag(name="article")
+     * @Rest\View(serializerGroups={"article"})
      */
-    public function putArticleAction(int $id, Request $request)
+    public function putArticleAction(int $id, Request $request, ConstraintViolationListInterface $validationErrors)
     {
-        $tl = $request->get('title');
-        $dp = $request->get('description');
-        $article = $this->articlesRepository->find($id);
-        if ($tl) {
-            $article->setTitle($tl);
+        if(!($validationErrors->count() > 0) ) {
+            $tl = $request->get('title');
+            $dp = $request->get('description');
+            $article = $this->articlesRepository->find($id);
+            if ($tl) {
+                $article->setTitle($tl);
+            }
+            if ($dp) {
+                $article->setDescription($dp);
+            }
+            $this->em->persist($article);
+            $this->em->flush();
+            return $this->view($article);
+        } else {
+            return new JsonResponse($this->PostPutDelete($validationErrors));
         }
-        if ($dp) {
-            $article->setDescription($dp);
-        }
-        $this->em->persist($article);
-        $this->em->flush();
-        return $this->view($article);
     }
     /**
      *  @SWG\Parameter(
@@ -129,15 +151,20 @@ class ArticlesController extends FOSRestController
      *     description="Api Token"
      * )
      * @SWG\Response(response=200, description="")
-     * @Rest\View(serializerGroups={"article.user"})
+     * @SWG\Tag(name="article")
+     * @Rest\View(serializerGroups={"article"})
      */
-    public function deleteArticleAction(Article $article)
+    public function deleteArticleAction(Article $article, ConstraintViolationListInterface $validationErrors)
     {
-        if($this->testUser($article->getUser())) {
-            $this->em->remove($article);
-            $this->em->flush();
+        if(!($validationErrors->count() > 0) ) {
+            if ($this->testUser($article->getUser())) {
+                $this->em->remove($article);
+                $this->em->flush();
+            } else {
+                return new JsonResponse('tu n as pas les droits');
+            }
         } else {
-            return new JsonResponse('tu n as pas les droits');
+            return new JsonResponse($this->PostPutDelete($validationErrors));
         }
     }
 }
