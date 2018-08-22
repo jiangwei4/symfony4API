@@ -26,7 +26,7 @@ class UsersController extends FOSRestController
     }
 
 
-    private function testUser($user)
+    private function testUser(User $user)
     {
         if ($this->getUser() === $user || in_array("ROLE_ADMIN",$this->getUser()->getRoles()) ) {
             $return = true;
@@ -71,13 +71,10 @@ class UsersController extends FOSRestController
      */
     public function getUsersAction()
     {
-        $user = $this->getUser();
-
-//        if (!$user || !in_array("ROLE_ADMIN", $user->getRoles())){
-//            return $this->view('Not Logged or not an Admin', 401);
-//        }
-
-        return $this->view($this->userRepository->findAll());
+        if ($this->testUserDroit()){
+            return $this->view($this->userRepository->findAll());
+        }
+        return $this->view('Not Logged or not an Admin', 401);
     }
 
 
@@ -96,13 +93,12 @@ class UsersController extends FOSRestController
      */
     public function getUserAction(User $user)
     {
-        if ($this->getUser() !== $user || !in_array("ROLE_ADMIN",$this->getUser()->getRoles())){
-            if ( !in_array("ROLE_ADMIN",$this->getUser()->getRoles()) ){
-                return $this->view('Not Authorized', 401);
-            }
-        }
+        if ($this->testUser($user)){
 
-        return $this->view($user);
+            return $this->view($user);
+        }
+        return $this->view('Not Authorized', 401);
+
     }
 
 

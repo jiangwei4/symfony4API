@@ -1,5 +1,10 @@
 App\Entity\User:
-    user_{1..10}:
+    user_1:
+        firstname: 'Chris'
+        lastname: 'Tof'
+        email: 'christ@tof.com'
+        apiKey: 'fixtureApiKey'
+    user_{2..10}:
         firstname: <firstName()>
         lastname: <lastName()>
         email: <email()>
