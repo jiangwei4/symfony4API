@@ -11,7 +11,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 class ArticlesController extends FOSRestController
@@ -124,7 +126,7 @@ class ArticlesController extends FOSRestController
      * @SWG\Tag(name="article")
      * @Rest\View(serializerGroups={"article"})
      */
-    public function putArticleAction(int $id, Request $request)
+    public function putArticleAction(int $id, Request $request, ValidatorInterface $validator)
     {
         $tl = $request->get('title');
         $dp = $request->get('description');
@@ -136,12 +138,12 @@ class ArticlesController extends FOSRestController
             $article->setDescription($dp);
         }
         $this->em->persist($article);
-
-        try {
+        /** @var ConstraintViolationList $valisationErrors */
+        $validationErrors = $validator->validate($article);
+        if(!($validationErrors->count() > 0) ) {
             $this->em->flush();
-        }
-        catch (\Exception $exception){
-            return $this->view($exception->getMessage(),  400);
+        } else {
+            return new JsonResponse($this->PostError($validationErrors));
         }
     }
     /**
@@ -159,12 +161,7 @@ class ArticlesController extends FOSRestController
     {
         if ($this->testUser($article->getUser())) {
             $this->em->remove($article);
-            try {
-                $this->em->flush();
-            }
-            catch (\Exception $exception){
-                return $this->view($exception->getMessage(),  400);
-            }
+            $this->em->flush();
         } else {
             return new JsonResponse('tu n as pas les droits');
         }

@@ -10,7 +10,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UsersController extends FOSRestController
 {
@@ -130,45 +132,47 @@ class UsersController extends FOSRestController
      * @SWG\Tag(name="user")
      * @Rest\View(serializerGroups={"user"})
      */
-    public function putUserAction(Request $request, $id)
+    public function putUserAction(Request $request, $id, ValidatorInterface $validator)
     {
 
-        if ($id === $this->getUser()->getId() || $this->testUserDroit()) {
+            if ($id == $this->getUser()->getId() || $this->testUserDroit()) {
 
-            /** @var User $us */
-            $us = $this->userRepository->find($id);
+                /** @var User $us */
+                $us = $this->userRepository->find($id);
 
-            $firstname = $request->get('firstname');
-            $lastname = $request->get('lastname');
-            $email = $request->get('email');
-            $birthday = $request->get('birthday');
-            $roles = $request->get('roles');
-            # $apikey = $request->get('apiKey');
-            if (isset($firstname)) {
-                $us->setFirstname($firstname);
+                $firstname = $request->get('firstname');
+                $lastname = $request->get('lastname');
+                $email = $request->get('email');
+                $birthday = $request->get('birthday');
+                $roles = $request->get('roles');
+                # $apikey = $request->get('apiKey');
+                if (isset($firstname)) {
+                    $us->setFirstname($firstname);
+                }
+                if (isset($lastname)) {
+                    $us->setLastname($lastname);
+                }
+                if (isset($email)) {
+                    $us->setEmail($email);
+                }
+                if (isset($birthday)) {
+                    $us->setBirthday($birthday);
+                }
+                if (isset($roles)) {
+                    $us->setRoles($roles);
+                }
+                $this->em->persist($us);
+                /** @var ConstraintViolationList $valisationErrors */
+                $validationErrors = $validator->validate($us);
+                if(!($validationErrors->count() > 0) ) {
+                    $this->em->flush();
+                } else {
+                    return new JsonResponse($this->PostError($validationErrors));
+                }
+            } else {
+                return new JsonResponse('Not the same user or tu n as pas les droits');
             }
-            if (isset($lastname)) {
-                $us->setLastname($lastname);
-            }
-            if (isset($email)) {
-                $us->setEmail($email);
-            }
-            if (isset($birthday)) {
-                $us->setBirthday($birthday);
-            }
-            if (isset($roles)) {
-                $us->setRoles($roles);
-            }
-            $this->em->persist($us);
-            try {
-                $this->em->flush();
-            }
-            catch (\Exception $exception){
-                return $this->view($exception->getMessage(),  400);
-            }
-        } else {
-            return new JsonResponse('error');
-        }
+
     }
 
     /**
@@ -188,12 +192,7 @@ class UsersController extends FOSRestController
         $us = $this->userRepository->find($id);
         if ($us === $this->getUser() || $this->testUserDroit()) {
             $this->em->remove($us);
-            try {
-                $this->em->flush();
-            }
-            catch (\Exception $exception){
-                return $this->view($exception->getMessage(),  400);
-            }
+            $this->em->flush();
         } else {
             return new JsonResponse('Not the same user or tu n as pas les droits');
         }
