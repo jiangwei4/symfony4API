@@ -3,7 +3,7 @@ namespace App\Tests;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class UsersControllerTest extends WebTestCase
 {
-    ///////////////////////////////////////////////tous les utilisateurs ////////////////////////////////////////
+  /*  ///////////////////////////////////////////////tous les utilisateurs ////////////////////////////////////////
     public function testGetUsersAdmin()
     {
         $client = static::createClient();
@@ -107,7 +107,7 @@ class UsersControllerTest extends WebTestCase
 
     }
     ///////////////////////////////////////////////put utilisateur n°3 ////////////////////////////////////////
-    public function testPutUserAdmin(){
+  /*  public function testPutUserAdmin(){
         $data = [
             "firstname" => "ffff",
             "lastname"=> "Ebert",
@@ -122,7 +122,7 @@ class UsersControllerTest extends WebTestCase
         $this->assertJson($content);
         $arrayContent = json_decode($content, true);
         $this->assertCount(6, $arrayContent);
-    }
+    }*/
   /*  public function testPutUserUser(){
         $data = [
             "firstname" => "ffff",
