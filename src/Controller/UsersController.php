@@ -71,10 +71,15 @@ class UsersController extends FOSRestController
      */
     public function getUsersAction()
     {
-        if ($this->testUserDroit()){
-            return $this->view($this->userRepository->findAll());
+        if($this->getUser() !== null )
+        {
+            if ($this->testUserDroit()) {
+                return $this->view($this->userRepository->findAll());
+            }
+            return $this->view('Not Logged for this user or not an Admin', 401);
+        } else {
+            return $this->view('Not Logged', 496);
         }
-        return $this->view('Not Logged or not an Admin', 401);
     }
 
 
@@ -93,11 +98,15 @@ class UsersController extends FOSRestController
      */
     public function getUserAction(User $user)
     {
-        if ($this->testUser($user)){
+        if($this->getUser() !== null ) {
+            if ($this->testUser($user)) {
 
-            return $this->view($user);
+                return $this->view($user);
+            }
+            return $this->view('Not Logged for this user or not an Admin', 401);
+        } else {
+            return $this->view('Not Logged', 496);
         }
-        return $this->view('Not Authorized', 401);
 
     }
 
@@ -111,12 +120,13 @@ class UsersController extends FOSRestController
      */
     public function postUsersAction(User $user, EntityManagerInterface $em, ConstraintViolationListInterface $validationErrors)
     {
+
         if(!($validationErrors->count() > 0) ){
             $this->em->persist($user);
             $this->em->flush();
             return $this->view($user);
         } else {
-            return new JsonResponse($this->PostError($validationErrors));
+            return $this->view($this->PostError($validationErrors),400);
         }
     }
 
