@@ -106,7 +106,7 @@ class UsersControllerTest extends WebTestCase
         dump($arrayContent = json_decode($content, true));
 
     }
-    ///////////////////////////////////////////////put ////////////////////////////////////////
+    ///////////////////////////////////////////////put utilisateur n°3 ////////////////////////////////////////
     public function testPutUserAdmin(){
         $data = [
             "firstname" => "ffff",
@@ -115,7 +115,7 @@ class UsersControllerTest extends WebTestCase
         ];
 
         $client = static::createClient();
-        $client->request('PUT', '/api/users', [], [], ['HTTP_CONTENT_TYPE' => 'application/json','HTTP_AUTH-TOKEN' => 'fixtureApiKey'], json_encode($data));
+        $client->request('PUT', '/api/users/3', [], [], ['HTTP_CONTENT_TYPE' => 'application/json','HTTP_AUTH-TOKEN' => 'fixtureApiKey'], json_encode($data));
         $response = $client->getResponse();
         $content = $response->getContent();
         $this->assertEquals(200, $response->getStatusCode());
@@ -123,11 +123,24 @@ class UsersControllerTest extends WebTestCase
         $arrayContent = json_decode($content, true);
         $this->assertCount(6, $arrayContent);
     }
-    public function testPutUserUser(){
+  /*  public function testPutUserUser(){
+        $data = [
+            "firstname" => "ffff",
+            "lastname"=> "Ebert",
+            "email"=> "aletha.fley@muller.com"
+        ];
+
+        $client = static::createClient();
+        $client->request('PUT', '/api/users/3', [], [], ['HTTP_CONTENT_TYPE' => 'application/json','HTTP_AUTH-TOKEN' => 'apiKey2'], json_encode($data));
+        $response = $client->getResponse();
+        $content = $response->getContent();
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertJson($content);
+        $arrayContent = json_decode($content, true);
+        $this->assertCount(6, $arrayContent);
+    }*/
+   /* public function testPutUserNotLogged(){
 
     }
-    public function testPutUserNotLogged(){
-
-    }
-
+*/
 }
