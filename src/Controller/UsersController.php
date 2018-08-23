@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\FOSRestController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -143,6 +142,11 @@ class UsersController extends FOSRestController
      */
     public function putUserAction(Request $request, $id, ValidatorInterface $validator)
     {
+        $users = $this->userRepository->find($id);
+        if($users === null){
+            return $this->view('User does note existe', 404);
+        }
+       // dump($this->getUser());die;
             if ($id == $this->getUser()->getId() || $this->testUserDroit()) {
 
                 /** @var User $us */
@@ -170,6 +174,7 @@ class UsersController extends FOSRestController
                 $validationErrors = $validator->validate($us);
                 if(!($validationErrors->count() > 0) ) {
                     $this->em->flush();
+                    return $this->view("ok",200);
                 } else {
                     return $this->view($this->PostError($validationErrors),401);
                 }

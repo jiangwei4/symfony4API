@@ -168,8 +168,53 @@ class UsersControllerTest extends WebTestCase
         $this->assertSame("User does note existe",$arrayContent);
     }
     ///////////////////////////////////////////////put utilisateur n°3 ////////////////////////////////////////
- /*   public function testPutUser3Admin(){
- 
+    public function testPutUser3Admin(){
+        $data = [
+            "firstname"=>"lol",
+            "email"=>"sdferty@yahoo.com"
+        ];
 
-    }*/
+        $client = static::createClient();
+        $client->request('PUT', '/api/users/4', [], [], ['CONTENT_TYPE' => 'application/json','HTTP_AUTH-TOKEN' => 'fixtureApiKey'], json_encode($data));
+        $response = $client->getResponse();
+        $content = $response->getContent();
+        dump($arrayContent = json_decode($content, true));
+        $this->assertEquals(200, $response->getStatusCode());
+
+    }
+    public function testPutUser3AdminError(){
+        $data = [
+            "email"=>"sdferty"
+        ];
+
+        $client = static::createClient();
+        $client->request('PUT', '/api/users/4', [], [], ['CONTENT_TYPE' => 'application/json','HTTP_AUTH-TOKEN' => 'fixtureApiKey'], json_encode($data));
+        $response = $client->getResponse();
+        $content = $response->getContent();
+        $this->assertEquals(401, $response->getStatusCode());
+        dump($arrayContent = json_decode($content, true));
+    }
+    public function testPutUser3456AdminError(){
+        $data = [
+            "email"=>"sdferty"
+        ];
+
+        $client = static::createClient();
+        $client->request('PUT', '/api/users/3456', [], [], ['CONTENT_TYPE' => 'application/json','HTTP_AUTH-TOKEN' => 'fixtureApiKey'], json_encode($data));
+        $response = $client->getResponse();
+        $content = $response->getContent();
+        $this->assertEquals(404, $response->getStatusCode());
+        $arrayContent = json_decode($content, true);
+        $this->assertSame("User does note existe",$arrayContent);
+    }
+    public function testPutUserUser(){
+        $data = [
+            "email"=>"sdfertfgdfy@yahoo.com"
+        ];
+
+        $client = static::createClient();
+        $client->request('PUT', '/api/users/2', [], [], ['CONTENT_TYPE' => 'application/json','HTTP_AUTH-TOKEN' => 'apiKey2'], json_encode($data));
+        $response = $client->getResponse();
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }
