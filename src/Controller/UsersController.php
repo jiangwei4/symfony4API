@@ -78,7 +78,7 @@ class UsersController extends FOSRestController
             }
             return $this->view('Not Logged for this user or not an Admin', 401);
         } else {
-            return $this->view('Not Logged', 496);
+            return $this->view('Not Logged', 401);
         }
     }
 
@@ -105,7 +105,7 @@ class UsersController extends FOSRestController
             }
             return $this->view('Not Logged for this user or not an Admin', 401);
         } else {
-            return $this->view('Not Logged', 496);
+            return $this->view('Not Logged', 401);
         }
 
     }
@@ -118,13 +118,13 @@ class UsersController extends FOSRestController
      * @Rest\Post("/users")
      * @ParamConverter("user", converter="fos_rest.request_body")
      */
-    public function postUsersAction(User $user, EntityManagerInterface $em, ConstraintViolationListInterface $validationErrors)
+    public function postUsersAction(User $user, EntityManagerInterface $em, ValidatorInterface $validator)
     {
-
+        $validationErrors = $validator->validate($user);
         if(!($validationErrors->count() > 0) ){
             $this->em->persist($user);
             $this->em->flush();
-            return $this->view($user);
+            return $this->view($user,200);
         } else {
             return $this->view($this->PostError($validationErrors),400);
         }
@@ -143,7 +143,6 @@ class UsersController extends FOSRestController
      */
     public function putUserAction(Request $request, $id, ValidatorInterface $validator)
     {
-
             if ($id == $this->getUser()->getId() || $this->testUserDroit()) {
 
                 /** @var User $us */
@@ -172,10 +171,10 @@ class UsersController extends FOSRestController
                 if(!($validationErrors->count() > 0) ) {
                     $this->em->flush();
                 } else {
-                    return new JsonResponse($this->PostError($validationErrors));
+                    return $this->view($this->PostError($validationErrors),401);
                 }
             } else {
-                return new JsonResponse('Not the same user or tu n as pas les droits');
+                return $this->view('Not the same user or tu n as pas les droits',401);
             }
 
     }
@@ -194,12 +193,20 @@ class UsersController extends FOSRestController
     public function deleteUserAction($id)
     {
         /** @var User $us */
-        $us = $this->userRepository->find($id);
-        if ($us === $this->getUser() || $this->testUserDroit()) {
-            $this->em->remove($us);
-            $this->em->flush();
+        $users = $this->userRepository->findBy(["id"=>$id]);
+        if($users === []){
+            return $this->view('User does note existe', 404);
+        }
+        if($this->getUser() !== null ) {
+            $us = $this->userRepository->find($id);
+            if ($us === $this->getUser() || $this->testUserDroit()) {
+                $this->em->remove($us);
+                $this->em->flush();
+            } else {
+                return $this->view('Not the same user or tu n as pas les droits',401);
+            }
         } else {
-            return new JsonResponse('Not the same user or tu n as pas les droits');
+            return $this->view('Not Logged', 401);
         }
     }
 
